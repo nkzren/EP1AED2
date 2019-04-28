@@ -37,15 +37,19 @@ typedef struct {
 } Arvore;
 
 
+
+
 /* Declaração de funções*/
 Grafo* initGrafo(int vertices, int arestas);
 Arvore* initArvore(int numElementos);
 
+//Funções utilitárias
 void split(char linha[], int array[]);
 int chaveMinima(Arvore *arvore);
+size_t getline(char **lineptr, size_t *n, FILE *stream);
+PontElemento* ordenaElementos(Arvore* arvore);
 
 Arvore* prim(Grafo* grafo, char (*string)[20], FILE* file);
-PontElemento* ordenaElementos(Arvore* arvore);
 
 void imprimeMatrizAdj(Grafo *grafo);
 void imprimeArvore(Arvore* arvore, char (*stringSaida)[], FILE* file);
@@ -235,4 +239,57 @@ PontElemento* ordenaElementos(Arvore* arvore) {
         }
     }
     return NULL;
+}
+
+// Função importada do gcc do GNU para ler uma linha do arquivo
+size_t getline(char **lineptr, size_t *n, FILE *stream) {
+    char *bufptr = NULL;
+    char *p = bufptr;
+    size_t size;
+    int c;
+
+    if (lineptr == NULL) {
+        return -1;
+    }
+    if (stream == NULL) {
+        return -1;
+    }
+    if (n == NULL) {
+        return -1;
+    }
+    bufptr = *lineptr;
+    size = *n;
+
+    c = fgetc(stream);
+    if (c == EOF) {
+        return -1;
+    }
+    if (bufptr == NULL) {
+        bufptr = malloc(128);
+        if (bufptr == NULL) {
+            return -1;
+        }
+        size = 128;
+    }
+    p = bufptr;
+    while(c != EOF) {
+        if ((p - bufptr) > (size - 1)) {
+            size = size + 128;
+            bufptr = realloc(bufptr, size);
+            if (bufptr == NULL) {
+                return -1;
+            }
+        }
+        *p++ = c;
+        if (c == '\n') {
+            break;
+        }
+        c = fgetc(stream);
+    }
+
+    *p++ = '\0';
+    *lineptr = bufptr;
+    *n = size;
+
+    return p - bufptr - 1;
 }
